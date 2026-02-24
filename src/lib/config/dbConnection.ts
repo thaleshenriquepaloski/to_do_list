@@ -8,9 +8,9 @@ const connectionString = `${process.env.DATABASE_URL}`
 const adapter = new PrismaLibSql({
     url: connectionString
 });
-const prisma = new PrismaClient({ adapter });
+const db = new PrismaClient({ adapter });
 
-export default prisma
+export default db
 
 // Função para testar conexão:
 

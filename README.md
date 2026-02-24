@@ -1,12 +1,17 @@
 # TO-DO List API
 
-## Uma API robusta para gerenciamento de tarefas, construída com foco em boas práticas, tipagem forte e persisntência de dados.
+## Uma API robusta para gerenciamento de tarefas, construída com foco em boas práticas, tipagem forte e persistência de dados.
 
-**Status do Projeto**: *Em desenvolvimento*
+**Boas Práticas Utilizadas no Desenvolvimento**
 
-Atualmente, a fundação do banco de dados e a estrutura do servidor estão prontas.
-Próximo passo é a implementação do CRUD.
+- Outside-In TDD: Testes de integração guiando o desenvolvimento.
+- Object Mapping: Contrução dinâmica de objetos para atualização de dados.
+- Clean Error Handling: Tratamento de erros centralizado no controller.
 
+**Status do Projeto**: *Em desenvolvimento (implementando rotas de CRUD com TDD)*
+
+Atualmente, a fundação do banco de dados, estrutura do servidor, o CRUD básico, e os testes de CRUD estão prontos.
+*Próximos passos* será criar o service e separar a responsabilidade.
 
 **Tecnologias Utilizadas:**
 
@@ -16,6 +21,7 @@ Próximo passo é a implementação do CRUD.
 * Prisma ORM (v7.4) - Manipulação do banco de dados
 * LibSQL / SQLite - Banco de dados local e leve
 * TSX - Executor de TypeScript de alta performance
+* Vitest - Executor dos testes
 
 
 **Pré-requisitos**
@@ -30,7 +36,7 @@ Antes de começar, você vai precisar ter instalado em sua máquina:
 
 **1. Clone do repositório:**
 
-- `git clone 'link-do-rep'`
+- `git clone git@github.com:thaleshenriquepaloski/to_do_list.git`
 
 **2. Instale as dependências:**
 
@@ -55,6 +61,13 @@ Antes de começar, você vai precisar ter instalado em sua máquina:
 Para iniciar o servidor em modo de desenvolvimento (com auto-reload):
 
 - `npm run dev`
+
+## Tabela de Endpoints:
+
+- Listar todas as tarefas: **GET** `/tarefas`
+- Busca uma tarefa por ID: **GET** `/tarefas/:id`
+- Cria uma nova tarefa:    **POST** `/tarefas`
+- Atualiza uma tarefa:     **PUT** `/tarefas/:id`
 
 
 O servidor estará disponível em http://localhost:3000

@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
+import TarefaServices from '../services/TarefaServices.ts';
 import db from '../lib/config/dbConnection.ts';
+
+const tarefaService = new TarefaServices();
 
 class TarefaController {
     async getAllTarefas(req: Request, res: Response) {
         try {
-            const tarefas = await db.todo.findMany();
+            const tarefas = await tarefaService.getAll();
             if (tarefas.length === 0) {
                 return res.status(404).json({ message: 'Nenhuma tarefa foi encontrada' });
             }
@@ -17,9 +20,7 @@ class TarefaController {
     async getTarefaById(req: Request, res: Response) {
         try {
             const id = Number(req.params.id);
-            const tarefa = await db.todo.findUnique({
-                where: { id }
-            })
+            const tarefa = await tarefaService.getById(id);
             if (!tarefa) return res.status(404).json({ message: 'Tarefa não encontrada' });
             return res.status(200).json(tarefa)
         } catch (err: any) {
@@ -29,16 +30,7 @@ class TarefaController {
 
     async createTarefa(req: Request, res: Response) {
         try {
-            const { description, priority, deadline } = req.body;
-
-            const novaTarefa = await db.todo.create({
-                data: {
-                    description: description,
-                    priority: priority,
-                    deadline: new Date(deadline)
-                }
-            })
-
+            const novaTarefa = await tarefaService.create(req.body);
             return res.status(201).json(novaTarefa);
         } catch (err: any) {
             return res.status(500).json({ message: err.message });
@@ -48,19 +40,7 @@ class TarefaController {
     async updateTarefa(req: Request, res: Response) {
         try {
             const id = Number(req.params.id);
-            const { description, priority, deadline, completed } = req.body;
-
-            const objetoUpdate: any = {};
-            if (description !== undefined) objetoUpdate.description = description;
-            if (priority !== undefined) objetoUpdate.priority = priority;
-            if (deadline !== undefined) objetoUpdate.deadline = deadline;
-            if (completed !== undefined) objetoUpdate.completed = completed;
-
-            const tarefaAtualizada = await db.todo.update({
-                where: { id },
-                data: objetoUpdate
-            });
-
+            const tarefaAtualizada = await tarefaService.update(id, req.body);
             return res.status(200).json(tarefaAtualizada);
         } catch (err: any) {
             console.error(err.message)

@@ -6,12 +6,12 @@
 
 - Outside-In TDD: Testes de integração guiando o desenvolvimento.
 - Object Mapping: Contrução dinâmica de objetos para atualização de dados.
-- Clean Error Handling: Tratamento de erros centralizado no controller.
+- Clean Error Handling: Tratamento de erros baseados em exceções (AppError) capturadas no Controller.
 
-**Status do Projeto**: *Em desenvolvimento (implementando rotas de CRUD com TDD)*
+**Status do Projeto**: *CRUD Finalizado*
 
-Atualmente, a fundação do banco de dados, estrutura do servidor, o CRUD básico, e os testes de CRUD estão prontos.
-*Próximos passos* será criar o service e separar a responsabilidade.
+Atualmente, a fundação do banco de dados, estrutura do servidor, o CRUD completo(Controller/Service), e cobertura de testes estão 100% operacionais.
+*Próximos passos:* Implementar atualização parcial (Patch-like), autenticação de usuário e documentação Swagger.
 
 **Tecnologias Utilizadas:**
 
@@ -69,6 +69,9 @@ Para iniciar o servidor em modo de desenvolvimento (com auto-reload):
 - Cria uma nova tarefa:    **POST** `/tarefas`
 - Atualiza uma tarefa:     **PUT** `/tarefas/:id`
 
+**Como rodar os testes:**
+
+- `npm test` (modo watch)
 
 O servidor estará disponível em http://localhost:3000
 

@@ -1,29 +1,33 @@
 import db from '../lib/config/dbConnection.ts';
+import { AppError } from '../erros/AppError.ts';
 
 class TarefaServices {
     async getAll() {
         return await db.todo.findMany({
-            orderBy: { createdAt: 'desc' }
+            orderBy: { deadline: 'asc' }
         })
     };
 
     async getById(id: number) {
-        return await db.todo.findUnique({
+        const tarefa = await db.todo.findUnique({
             where: { id }
         })
+        if (!tarefa) throw new AppError('Tarefa não encontrada', 404);
+        return tarefa;
     };
 
     async create(data: any) {
         const { description, priority, deadline } = data;
 
-        const object: any = {};
-        if (description !== undefined) object.description = description;
-        if (priority !== undefined) object.priority = priority;
-        if (deadline !== undefined) object.deadline = deadline;
+        if (!description) throw new AppError('O campo de descrição é obrigatório.', 400);
+        if (!priority) throw new AppError('O campo prioridade é obrigatório.', 400);
+        if (!deadline) throw new AppError('O prazo de entrega é obrigatório', 400);
 
         return await db.todo.create({
             data: {
-                ...object
+                description,
+                priority,
+                deadline: new Date(deadline)
             }
         })
     };
@@ -32,15 +36,30 @@ class TarefaServices {
         const { description, priority, deadline, completed } = data;
 
         const objetoUpdate: any = {};
-        if (description !== undefined) objetoUpdate.description = description;
-        if (priority !== undefined) objetoUpdate.priority = priority;
-        if (deadline !== undefined) objetoUpdate.deadline = deadline;
-        if (completed !== undefined) objetoUpdate.completed = completed;
+
+        if (!description) throw new AppError('A descrição é obrigatória')
+        objetoUpdate.description = description
+        if (!priority) throw new AppError('A prioridade é obrigatória')
+        objetoUpdate.priority = priority;
+        if (!deadline) throw new AppError('O prazo é obrigatório')
+        objetoUpdate.deadline = deadline;
 
         return await db.todo.update({
             where: { id },
             data: objetoUpdate
         })
+    };
+
+    async delete(id: number) {
+        const tarefa = await db.todo.findUnique({
+            where: { id }
+        });
+
+        if (!tarefa) throw new AppError('Tarefa não encontrada', 404);
+
+        return await db.todo.delete({
+            where: { id }
+        });
     };
 }
 

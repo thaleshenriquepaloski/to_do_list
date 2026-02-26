@@ -2,11 +2,12 @@ import db from '../lib/config/dbConnection.ts';
 import { AppError } from '../erros/AppError.ts';
 
 class TarefaServices {
-    async getAll() {
+    async getAll(userId: string) {
         const listaTarefas = await db.todo.findMany({
+            where: { userId },
             orderBy: { deadline: 'asc' }
         });
-        if (Object.keys(listaTarefas).length === 0) throw new AppError('Nenhuma tarefa encontrada', 404)
+        if (listaTarefas.length === 0) throw new AppError('Nenhuma tarefa encontrada', 404)
         return listaTarefas
     };
 
@@ -19,17 +20,19 @@ class TarefaServices {
     };
 
     async create(data: any) {
-        const { description, priority, deadline } = data;
+        const { description, priority, deadline, userId } = data;
 
         if (!description) throw new AppError('O campo de descrição é obrigatório.', 400);
         if (!priority) throw new AppError('O campo prioridade é obrigatório.', 400);
         if (!deadline) throw new AppError('O prazo de entrega é obrigatório', 400);
+        if (!userId) throw new AppError('O id do usuário não foi fornecido');
 
         return await db.todo.create({
             data: {
                 description,
                 priority,
-                deadline: new Date(deadline)
+                deadline: new Date(deadline),
+                userId
             }
         })
     };

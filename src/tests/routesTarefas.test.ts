@@ -1,37 +1,53 @@
-import { describe, it, expect, afterEach } from "vitest";
+import { describe, it, expect, afterEach, beforeEach } from "vitest";
 import request from "supertest";
 import app from '../app.ts';
 import db from "../lib/config/dbConnection.ts";
 
+let idUsuarioParaTeste: string;
+beforeEach(async () => {
+    await db.todo.deleteMany();
+    await db.user.deleteMany();
 
-afterEach(async () => {
-    await db.todo.deleteMany({
-        where: {
-            id: {
-                gt: 3
-            }
+    const novoUser = await db.user.create({
+        data: {
+            email: 'teste@teste.com',
+            password: 'password123',
+            name: 'Testador'
         }
     });
+
+    idUsuarioParaTeste = novoUser.id;
 });
 
 describe('GET /tarefas/', () => {
 
     it('Deve retornar uma lista de tarefas com campos corretos', async () => {
-        const tarefas = await request(app).get('/tarefas');
+        const objetoTarefa = objetoCriarTarefa(idUsuarioParaTeste);
+        await request(app)
+            .post('/tarefas')
+            .send(objetoTarefa);
 
-        expect(tarefas.status).toBe(200);
-        expect(Array.isArray(tarefas.body)).toBe(true);
-        if (tarefas.body.length > 0) {
-            expect(tarefas.body[0]).toHaveProperty('description');
-            expect(tarefas.body[0]).toHaveProperty('id');
+        const response = await request(app)
+            .get('/tarefas')
+            .send({ userId: idUsuarioParaTeste });
+
+        expect(response.status).toBe(200);
+        if (response.body.length > 0) {
+            expect(response.body[0]).toHaveProperty('id');
+            expect(response.body[0]).toHaveProperty('description');
         }
     });
 
     it('Deve retornar uma tarefa pelo ID', async () => {
-        const tarefaBuscada = await criarTarefa();
-        const id = Number(tarefaBuscada.id);
+        const objetoTarefa = objetoCriarTarefa(idUsuarioParaTeste);
+        const tarefaBuscada = await request(app)
+            .post('/tarefas')
+            .send(objetoTarefa);
+
+        const id = Number(tarefaBuscada.body.id);
         const response = await request(app)
             .get(`/tarefas/${id}`)
+            .send({ userId: idUsuarioParaTeste })
 
         expect(response.body).toHaveProperty('id');
         expect(response.body).toHaveProperty('description');
@@ -56,15 +72,14 @@ describe('GET /tarefas/', () => {
 describe('POST - /tarefas', () => {
 
     it('Deve cadastrar uma nova tarefa', async () => {
-        const novaTarefa = await criarTarefa();
-
+        const objetoTarefa = objetoCriarTarefa(idUsuarioParaTeste);
         const response = await request(app)
             .post('/tarefas')
-            .send(novaTarefa);
+            .send(objetoTarefa);
 
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('id');
-        expect(response.body.description).toBe(novaTarefa.description);
+        expect(response.body.description).toBe(objetoTarefa.description);
     });
 
     it('Deve retornar erro 400 por faltar descrição', async () => {
@@ -105,20 +120,38 @@ describe('POST - /tarefas', () => {
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty('message', 'O prazo de entrega é obrigatório');
     });
+
+    it('Deve retornar erro 400 por faltar o id do usuário', async () => {
+        const response = await request(app)
+            .post('/tarefas')
+            .send({
+                description: 'Teste',
+                priority: 'Alta',
+                deadline: '2026-03-02T10:00:00.000Z',
+                //faltando userId;
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty('message', 'O id do usuário não foi fornecido');
+    });
 });
 
 describe('PUT - /tarefas/:id', () => {
 
     it('Deve atualizar uma tarefa já cadastrada', async () => {
-        const tarefa = await criarTarefa();
-        const id = Number(tarefa.id);
+        const objetoTarefa = objetoCriarTarefa(idUsuarioParaTeste);
+        const tarefa = await request(app)
+            .post('/tarefas')
+            .send(objetoTarefa);
+        const id = Number(tarefa.body.id);
 
         const response = await request(app)
             .patch(`/tarefas/${id}`)
             .send({
                 description: 'Teste de criar tarefa e atualizada',
                 priority: 'Alta',
-                deadline: '2026-10-10T10:00:00.000Z'
+                deadline: '2026-10-10T10:00:00.000Z',
+                userId: idUsuarioParaTeste
             });
 
         expect(response.status).toBe(200);
@@ -126,18 +159,22 @@ describe('PUT - /tarefas/:id', () => {
     });
 
     const cenariosErros = [
-        { campo: 'description', dados: { description: '', priority: 'Alta', deadline: '2026-10-10T10:00:00.000Z' }, message: 'A descrição não pode ser vazia' },
-        { campo: 'priority', dados: { description: 'Tarefa atualizada', priority: '', deadline: '2026-10-10T10:00:00.000Z' }, message: 'A prioridade não pode ser vazia' },
-        { campo: 'deadline', dados: { description: 'Tarefa atualizada', priority: 'Alta', deadline: '' }, message: 'O prazo não pode ser vazio' }
+        { campo: 'description', dados: { description: '', priority: 'Alta', deadline: '2026-10-10T10:00:00.000Z', userId: idUsuarioParaTeste }, message: 'A descrição não pode ser vazia' },
+        { campo: 'priority', dados: { description: 'Tarefa atualizada', priority: '', deadline: '2026-10-10T10:00:00.000Z', userId: idUsuarioParaTeste }, message: 'A prioridade não pode ser vazia' },
+        { campo: 'deadline', dados: { description: 'Tarefa atualizada', priority: 'Alta', deadline: '', userId: idUsuarioParaTeste }, message: 'O prazo não pode ser vazio' }
     ];
 
     cenariosErros.forEach((cenario) => {
         it(`Deve retornar 400 se o campo ${cenario.campo} for vazio`, async () => {
-            const tarefa = await criarTarefa();
-            const id = Number(tarefa.id);
+            const objetoTarefa = objetoCriarTarefa(idUsuarioParaTeste);
+            const tarefa = await request(app)
+                .post('/tarefas')
+                .send(objetoTarefa);
+
+            const idTarefa = Number(tarefa.body.id);
 
             const response = await request(app)
-                .patch(`/tarefas/${id}`)
+                .patch(`/tarefas/${idTarefa}`)
                 .send(cenario.dados);
 
             expect(response.status).toBe(400);
@@ -150,8 +187,11 @@ describe('PUT - /tarefas/:id', () => {
 describe('DELETE - /tarefas/:id', () => {
 
     it('Deve excluir uma tarefa criada', async () => {
-        const tarefa = await criarTarefa();
-        const idDeletar = tarefa.id;
+        const objetoTarefa = objetoCriarTarefa(idUsuarioParaTeste);
+        const tarefa = await request(app)
+            .post('/tarefas')
+            .send(objetoTarefa);
+        const idDeletar = tarefa.body.id;
 
         const response = await request(app)
             .delete(`/tarefas/${idDeletar}`);
@@ -170,13 +210,12 @@ describe('DELETE - /tarefas/:id', () => {
     });
 });
 
-const criarTarefa = async () => {
-    return await db.todo.create({
-        data: {
-            description: 'Teste de criar tarefa e atualizada',
-            priority: 'Baixa',
-            deadline: new Date(),
-            completed: false
-        }
-    });
-};
+const objetoCriarTarefa = (idUser: string) => (
+    {
+        description: 'Teste de criar tarefa e atualizada',
+        priority: 'Baixa',
+        deadline: new Date(),
+        completed: false,
+        userId: idUser
+    }
+);

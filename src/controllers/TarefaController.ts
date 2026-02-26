@@ -5,7 +5,8 @@ const tarefaService = new TarefaServices();
 
 class TarefaController {
     async getAllTarefas(req: Request, res: Response) {
-        const tarefas = await tarefaService.getAll();
+        const { userId } = req.body;
+        const tarefas = await tarefaService.getAll(userId);
         return res.status(200).json(tarefas);
     };
 

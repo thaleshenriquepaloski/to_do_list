@@ -3,9 +3,11 @@ import { AppError } from '../erros/AppError.ts';
 
 class TarefaServices {
     async getAll() {
-        return await db.todo.findMany({
+        const listaTarefas = await db.todo.findMany({
             orderBy: { deadline: 'asc' }
-        })
+        });
+        if (Object.keys(listaTarefas).length === 0) throw new AppError('Nenhuma tarefa encontrada', 404)
+        return listaTarefas
     };
 
     async getById(id: number) {

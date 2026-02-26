@@ -114,7 +114,7 @@ describe('PUT - /tarefas/:id', () => {
         const id = Number(tarefa.id);
 
         const response = await request(app)
-            .put(`/tarefas/${id}`)
+            .patch(`/tarefas/${id}`)
             .send({
                 description: 'Teste de criar tarefa e atualizada',
                 priority: 'Alta',
@@ -126,9 +126,9 @@ describe('PUT - /tarefas/:id', () => {
     });
 
     const cenariosErros = [
-        { campo: 'description', dados: { description: '', priority: 'Alta', deadline: '2026-10-10T10:00:00.000Z' }, message: 'A descrição é obrigatória' },
-        { campo: 'priority', dados: { description: 'Tarefa atualizada', priority: '', deadline: '2026-10-10T10:00:00.000Z' }, message: 'A prioridade é obrigatória' },
-        { campo: 'deadline', dados: { description: 'Tarefa atualizada', priority: 'Alta', deadline: '' }, message: 'O prazo é obrigatório' }
+        { campo: 'description', dados: { description: '', priority: 'Alta', deadline: '2026-10-10T10:00:00.000Z' }, message: 'A descrição não pode ser vazia' },
+        { campo: 'priority', dados: { description: 'Tarefa atualizada', priority: '', deadline: '2026-10-10T10:00:00.000Z' }, message: 'A prioridade não pode ser vazia' },
+        { campo: 'deadline', dados: { description: 'Tarefa atualizada', priority: 'Alta', deadline: '' }, message: 'O prazo não pode ser vazio' }
     ];
 
     cenariosErros.forEach((cenario) => {
@@ -137,7 +137,7 @@ describe('PUT - /tarefas/:id', () => {
             const id = Number(tarefa.id);
 
             const response = await request(app)
-                .put(`/tarefas/${id}`)
+                .patch(`/tarefas/${id}`)
                 .send(cenario.dados);
 
             expect(response.status).toBe(400);

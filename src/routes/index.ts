@@ -9,7 +9,7 @@ routes
     .get('/tarefas', tarefaController.getAllTarefas)
     .get('/tarefas/:id', tarefaController.getTarefaById)
     .post('/tarefas', tarefaController.createTarefa)
-    .put('/tarefas/:id', tarefaController.updateTarefa)
+    .patch('/tarefas/:id', tarefaController.updateTarefa)
     .delete('/tarefas/:id', tarefaController.deletarTarefa)
 
 export default routes;

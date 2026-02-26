@@ -6,12 +6,12 @@
 
 - Outside-In TDD: Testes de integração guiando o desenvolvimento.
 - Object Mapping: Contrução dinâmica de objetos para atualização de dados.
-- Clean Error Handling: Tratamento de erros baseados em exceções (AppError) capturadas no Controller.
+- Clean Error Handling: Tratamento de erros centralizado via Middleware, utilizando em exceções customizadas (AppError) e eliminando `try/catch` nos controllers; 
 
-**Status do Projeto**: *CRUD Finalizado*
+**Status do Projeto**: **EM DESENVOLVIMENTO** *Estrutura Core & Error Handling Finalizados*
 
-Atualmente, a fundação do banco de dados, estrutura do servidor, o CRUD completo(Controller/Service), e cobertura de testes estão 100% operacionais.
-*Próximos passos:* Implementar atualização parcial (Patch-like), autenticação de usuário e documentação Swagger.
+Atualmente, a fundação do banco de dados, estrutura do servidor, o CRUD completo(Controller/Service), e cobertura de testes estão 100% operacionais e validados por testes.
+*Próximos passos:* `feature/users-auth` Implementar autenticação, JWT e isolamento de tarefas por usuário.
 
 **Tecnologias Utilizadas:**
 
@@ -67,7 +67,8 @@ Para iniciar o servidor em modo de desenvolvimento (com auto-reload):
 - Listar todas as tarefas: **GET** `/tarefas`
 - Busca uma tarefa por ID: **GET** `/tarefas/:id`
 - Cria uma nova tarefa:    **POST** `/tarefas`
-- Atualiza uma tarefa:     **PUT** `/tarefas/:id`
+- Atualiza uma tarefa:     **PATCH** `/tarefas/:id`
+- Deleta uma tarefa:       **DELETE** `/tarefas/:id`
 
 **Como rodar os testes:**
 

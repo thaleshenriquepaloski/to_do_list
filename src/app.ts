@@ -1,5 +1,5 @@
 import e from "express";
-import router from "./routes";
+import router from "./routes/index.ts";
 import { errorMiddleware } from "./middlewares/errorMiddleware.ts";
 
 const app = e();

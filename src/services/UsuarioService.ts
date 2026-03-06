@@ -38,6 +38,16 @@ class UsuarioService {
             name: novoUsuario.name
         };
     }
+
+    async pegarUsuarios () {
+        return await db.user.findMany({
+            select: {
+                id: true,
+                email: true,
+                name: true
+            }
+        });
+    }
 }
 
 export default UsuarioService;

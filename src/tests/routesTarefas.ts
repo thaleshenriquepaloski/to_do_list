@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeEach } from "vitest";
+import { describe, it, expect, afterEach, beforeEach, afterAll } from "vitest";
 import request from "supertest";
 import app from '../app.ts';
 import db from "../lib/config/dbConnection.ts";
@@ -6,7 +6,6 @@ import db from "../lib/config/dbConnection.ts";
 let idUsuarioParaTeste: string;
 beforeEach(async () => {
     await db.todo.deleteMany();
-    await db.user.deleteMany();
 
     const novoUser = await db.user.create({
         data: {
@@ -18,8 +17,15 @@ beforeEach(async () => {
 
     idUsuarioParaTeste = novoUser.id;
 });
+afterAll(async () => {
+    await db.user.deleteMany({
+        where: {
+            email: 'teste@teste.com'
+        }
+    });
+})
 
-describe('GET /tarefas/', () => {
+describe('GET /tarefas/buscar', () => {
 
     it('Deve retornar uma lista de tarefas com campos corretos', async () => {
         const objetoTarefa = objetoCriarTarefa(idUsuarioParaTeste);
@@ -28,7 +34,7 @@ describe('GET /tarefas/', () => {
             .send(objetoTarefa);
 
         const response = await request(app)
-            .get('/tarefas')
+            .get('/tarefas/buscar')
             .send({ userId: idUsuarioParaTeste });
 
         expect(response.status).toBe(200);

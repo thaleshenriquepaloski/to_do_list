@@ -12,6 +12,15 @@ class UsuarioController {
             next(error)
         }
     }
+
+    async pegarUsuarios (req: Request, res: Response, next: NextFunction) {
+        try {
+            const usuarios = await usuarioService.pegarUsuarios();
+            return res.status(200).json(usuarios);
+        } catch (error) {
+            next(error)
+        }
+    } 
 }
 
 export default UsuarioController;

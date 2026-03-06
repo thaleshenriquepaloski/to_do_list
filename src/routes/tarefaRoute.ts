@@ -6,10 +6,10 @@ const tarefaController = new TarefaController();
 const routes = Router();
 
 routes
-    .get('/tarefas', tarefaController.getAllTarefas)
-    .get('/tarefas/:id', tarefaController.getTarefaById)
-    .post('/tarefas', tarefaController.createTarefa)
-    .patch('/tarefas/:id', tarefaController.updateTarefa)
-    .delete('/tarefas/:id', tarefaController.deletarTarefa)
+    .get('/pegar', tarefaController.getAllTarefas)
+    .get('/pegar/:id', tarefaController.getTarefaById)
+    .post('/cadastrar', tarefaController.createTarefa)
+    .patch('/atualizar/:id', tarefaController.updateTarefa)
+    .delete('/deletar/:id', tarefaController.deletarTarefa)
 
 export default routes;

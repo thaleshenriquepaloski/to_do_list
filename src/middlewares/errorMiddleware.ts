@@ -7,6 +7,9 @@ export const errorMiddleware = (
     res: Response,
     next: NextFunction
 ) => {
+
+    console.error("DEBUG ERRO:", error)
+
     const statusCode = error.statusCode || 500;
     const message = error.message || 'Erro interno do servidor';
 

@@ -1,15 +1,13 @@
-import { Router } from "express";
-import TarefaController from "../controllers/TarefaController.ts";
+import e from "express";
+import tarefaRouter from './tarefaRoute.ts';
+import usuarioRoute from './usuarioRoute.ts';
 
-const tarefaController = new TarefaController();
+const router = (app) => {
+    app.use(
+        e.json(),
+        tarefaRouter,
+        usuarioRoute,
+    )
+};
 
-const routes = Router();
-
-routes
-    .get('/tarefas', tarefaController.getAllTarefas)
-    .get('/tarefas/:id', tarefaController.getTarefaById)
-    .post('/tarefas', tarefaController.createTarefa)
-    .patch('/tarefas/:id', tarefaController.updateTarefa)
-    .delete('/tarefas/:id', tarefaController.deletarTarefa)
-
-export default routes;
+export default router;

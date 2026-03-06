@@ -1,5 +1,5 @@
 import { AppError } from "../erros/AppError.ts";
-import db from "../lib/config/dbConnection";
+import db from "../lib/config/dbConnection.ts";
 import { z } from 'zod';
 import { hash } from 'bcryptjs';
 

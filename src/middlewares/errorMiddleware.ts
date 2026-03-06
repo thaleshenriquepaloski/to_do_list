@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { AppError } from '../erros/AppError.ts';
+import type { Request, Response, NextFunction } from 'express';
+import type { AppError } from '../erros/AppError.ts';
 
 export const errorMiddleware = (
     error: Error & Partial<AppError>,
@@ -8,7 +8,9 @@ export const errorMiddleware = (
     next: NextFunction
 ) => {
 
-    console.error("DEBUG ERRO:", error)
+    if(process.env.NODE_TEST) {
+        console.error("DEBUG ERRO:", error)
+    }
 
     const statusCode = error.statusCode || 500;
     const message = error.message || 'Erro interno do servidor';

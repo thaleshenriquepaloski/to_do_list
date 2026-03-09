@@ -2,22 +2,6 @@ import db from '../lib/config/dbConnection.ts';
 import { AppError } from '../erros/AppError.ts';
 
 class TarefaServices {
-    async getAll(userId: string) {
-        const listaTarefas = await db.todo.findMany({
-            where: { userId },
-            orderBy: { deadline: 'asc' }
-        });
-        if (listaTarefas.length === 0) throw new AppError('Nenhuma tarefa encontrada', 404)
-        return listaTarefas
-    };
-
-    async getById(id: number) {
-        const tarefa = await db.todo.findUnique({
-            where: { id }
-        })
-        if (!tarefa) throw new AppError('Tarefa não encontrada', 404);
-        return tarefa;
-    };
 
     async create(data: any) {
         const { description, priority, deadline, userId } = data;
@@ -37,10 +21,37 @@ class TarefaServices {
         })
     };
 
-    async update(id: number, data: any) {
-        const { description, priority, deadline, completed } = data;
+    async getAll(dto: any) {
+        const listaTarefas = await db.todo.findMany({
+            where: {
+                userId: dto.userId
+            },
+            orderBy: { deadline: 'asc' }
+        });
+        if (listaTarefas.length === 0) throw new AppError('Nenhuma tarefa encontrada', 404)
+        return listaTarefas
+    };
+
+    async getById(dto: any) {
+        const tarefa = await db.todo.findFirst({
+            where: { 
+                id: dto.id,
+                userId: dto.userId
+            }
+        });
+        if (!tarefa) throw new AppError('Tarefa não encontrada', 404);
+        return tarefa;
+    };
+
+    async update(dto: any) {
+        const { description, priority, deadline, completed } = dto;
         const objetoUpdate: any = {};
-        const tarefaExiste = await db.todo.findUnique({ where: { id } });
+        const tarefaExiste = await db.todo.findFirst({
+            where: {
+                id: dto.id,
+                userId: dto.userId
+            }
+        });
         if (!tarefaExiste) throw new AppError('Tarefa não encontrada', 404);
 
         if (description !== undefined) {
@@ -71,21 +82,24 @@ class TarefaServices {
         }
 
         return await db.todo.update({
-            where: { id },
+            where: { id: tarefaExiste.id },
             data: objetoUpdate
         });
 
     };
 
-    async delete(id: number) {
-        const tarefa = await db.todo.findUnique({
-            where: { id }
+    async delete(dto: any) {
+        const tarefa = await db.todo.findFirst({
+            where: {
+                userId: dto.userId,
+                id: dto.id
+            }
         });
 
         if (!tarefa) throw new AppError('Tarefa não encontrada', 404);
 
         return await db.todo.delete({
-            where: { id }
+            where: { id: tarefa.id }
         });
     };
 }

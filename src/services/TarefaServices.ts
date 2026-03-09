@@ -3,22 +3,23 @@ import { AppError } from '../erros/AppError.ts';
 
 class TarefaServices {
 
-    async create(data: any) {
-        const { description, priority, deadline, userId } = data;
+    async create(dto: any) {
+        const { description, priority, deadline, userId } = dto;
 
         if (!description) throw new AppError('O campo de descrição é obrigatório.', 400);
         if (!priority) throw new AppError('O campo prioridade é obrigatório.', 400);
         if (!deadline) throw new AppError('O prazo de entrega é obrigatório', 400);
         if (!userId) throw new AppError('O id do usuário não foi fornecido');
 
-        return await db.todo.create({
+        const novaTarefa = await db.todo.create({
             data: {
                 description,
                 priority,
                 deadline: new Date(deadline),
                 userId
             }
-        })
+        });
+        return novaTarefa;
     };
 
     async getAll(dto: any) {
@@ -91,8 +92,8 @@ class TarefaServices {
     async delete(dto: any) {
         const tarefa = await db.todo.findFirst({
             where: {
+                id: dto.id,
                 userId: dto.userId,
-                id: dto.id
             }
         });
 

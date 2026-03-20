@@ -1,4 +1,7 @@
 FROM node:20-slim
+
+RUN apt-get update -y && apt-get install -y openssl
+
 WORKDIR /usr/src/app
 
 # Install the application dependencies
@@ -7,6 +10,8 @@ RUN npm install
 
 # Copy in the source code
 COPY . .
+
+RUN npx prisma generate
 EXPOSE 3000
 
-CMD ['npm', 'run', 'dev']
+CMD ["npm", "run", "dev"]

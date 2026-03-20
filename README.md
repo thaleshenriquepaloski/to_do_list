@@ -38,29 +38,31 @@ Antes de começar, você vai precisar ter instalado em sua máquina:
 
 - `git clone git@github.com:thaleshenriquepaloski/to_do_list.git`
 
-**2. Instale as dependências:**
+**2. Variáveis de Ambiente:**
 
-- `npm install`
+- Copie e cole as configurações abaixo no seu .env:
 
-**3. Variáveis de Ambiente:**
+- POSTGRES_USER=user
+- POSTGRES_PASSWORD=password
+- POSTGRES_DB=todolist
+- DATABASE_URL="postgresql://user:password@db:5432/todolist?schema=public"
+- PORT=3000
+- JWT_SECRET="qualquer_string_muito_louca_aqui_123"
 
-- Crie um arquivo .env na raiz do projeto e adicione a URL de conexão com o SQLite. O Prisma 7 com o adapter LibSQL utiliza o seguinte formato:
-- DATABASE_URL="file:./dev.db"
+**3. Suba os containers**
 
-**4. Gere o Prisma Client:**
+- `sudo docker compose up -d --build`
 
-- `npx prisma generate`
+**4.  Como o banco sobe zerado, você precisa criar as tabelas**
 
-**5.  Rode as Migrations (para criar as tabelas):**
-
-- `npx prisma migrate dev --name init`
+- `sudo docker compose exec api npx prisma migrate dev --name init`
 
 
-**Como rodar o projeto**
+**Testat a API**
 
-Para iniciar o servidor em modo de desenvolvimento (com auto-reload):
+O container da API já esta confugurado para auto-reload:
 
-- `npm run dev`
+- `http://localhost:3000`
 
 ## Tabela de Endpoints:
 
